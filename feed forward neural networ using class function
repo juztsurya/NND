@@ -1,0 +1,57 @@
+import numpy as np
+
+class FeedForwardNeuralNetwork:
+    def __init__(self, lr=0.1):
+        self.w = np.array([[1, 2], [3, 4], [5, 6]], dtype=np.float64)
+        self.b = np.array([0.1, 0.2], dtype=np.float64)
+        self.w2 = np.array([0.2, 0.3], dtype=np.float64)
+        self.b2 = np.array([0.05], dtype=np.float64)
+        self.lr = lr
+    
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+    
+    def sigmoid_derivative(self, x):
+        return self.sigmoid(x) * (1 - self.sigmoid(x))
+    
+    def forward(self, x):
+        self.z = np.dot(x, self.w) + self.b
+        self.a = self.sigmoid(self.z)
+        self.z2 = np.dot(self.a, self.w2) + self.b2
+        self.a2 = self.sigmoid(self.z2)
+        return self.a2
+    
+    def compute_loss(self, y, y_pred):
+        self.loss = (y - y_pred) ** self.z[0]
+        return self.loss
+    
+    def backward_w2(self, y):
+        dloss_da2 = -2 * (y - self.a2)
+        da2_dz2 = self.sigmoid_derivative(self.z2)
+        dz2_dw2 = self.a
+        grad_w2 = dloss_da2 * da2_dz2 * dz2_dw2
+        self.w2 -= self.lr * grad_w2
+        return self.w2
+    
+    def train(self, x, y, epochs=1):
+        for epoch in range(epochs):
+            y_pred = self.forward(x)
+            loss = self.compute_loss(y, y_pred)
+            output = self.forward(x)
+            loss = self.compute_loss(y, output)
+            self.backward_w2(y)
+        return self.a2, self.loss, self.w2
+        
+x_input = np.array([10, 20, 30])
+y_target = 1
+learning_rate = 0.1
+nn = NeuralNetwork(lr=learning_rate)
+final_output, final_loss, updated_w2 = nn.train(x_input, y_target)
+
+print("Final Output:", final_output)
+print("Final Loss:", final_loss)
+print("Updated w2:", updated_w2)
+--------------------------------
+Final Output: [0.63413559]
+Final Loss: [7.70491819e-97]
+Updated w2: [0.21697667 0.31697667]

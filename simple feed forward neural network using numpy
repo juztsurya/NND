@@ -1,0 +1,39 @@
+import numpy as np
+x = np.array([10, 20, 30])
+print(x)
+w = np.array([[1, 2], [3, 4], [5, 6]])
+print(w)
+b = np.array([0.1, 0.2])
+z = np.dot(x, w) + b
+print("Output:",z)
+def sigmoid(val):
+    return 1/(1+np.exp(-val))
+
+a = sigmoid(z)
+print("Activated Output:",a)
+
+w2 = np.array([0.2, 0.3])
+b2 = np.array([0.05])
+z2 = np.dot(a, w2)+b2
+a2 = sigmoid(z2)
+print("Final Output:",a2)
+y = 1
+loss = (y-a2)**z
+print("Loss:", loss)
+lr = 0.1
+dloss_da2 = -2*(y-a2)
+da2_dz2 = a2*(1-a2)
+dz2_dw2 = a 
+grad_w2 = dloss_da2 * da2_dz2 * dz2_dw2
+w2 = w2 - lr * grad_w2
+print("Updated w2:", w2)
+------------------------
+[10 20 30]
+[[1 2]
+ [3 4]
+ [5 6]]
+Output: [220.1 280.2]
+Activated Output: [1. 1.]
+Final Output: [0.63413559]
+Loss: [7.70491819e-097 4.38843702e-123]
+Updated w2: [0.21697667 0.31697667]

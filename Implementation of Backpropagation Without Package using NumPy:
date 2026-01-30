@@ -1,0 +1,38 @@
+import numpy as np
+# Hyperparameters
+input_size = 3
+hidden_size = 2
+output_size = 1
+lr = 0.2
+epochs = 1000
+# Initialize weights and biases
+np.random.seed(1)
+W1 = np.random.rand(input_size, hidden_size)
+b1 = np.random.rand(hidden_size)
+W2 = np.random.rand(hidden_size, output_size)
+b2 = np.random.rand(output_size)
+# Training data
+x = np.array([[1, 8, 3]])
+y = np.array([[0.9]])
+for _ in range(epochs):
+ # Forward pass
+ z1 = x @ W1 + b1
+ a1 = 1 / (1 + np.exp(-z1)) # Inlined sigmoid
+ z2 = a1 @ W2 + b2
+ a2 = 1 / (1 + np.exp(-z2)) # Inlined sigmoid
+loss = (y - a2)**2     # Calculate loss
+# Backward pass
+# Inlined sigmoid_derivative: a*(1-a)
+dz2 = 2 * (a2 - y) * (a2 * (1 - a2))
+dW2 = a1.T @ dz2
+db2 = dz2.sum(axis=0)
+dz1 = (dz2 @ W2.T) * (a1 * (1 - a1))
+dW1 = x.T @ dz1
+db1 = dz1.sum(axis=0)
+# Update weights and biases
+W2 -= lr * dW2
+b2 -= lr * db2
+W1 -= lr * dW1
+b1 -= lr * db1
+print("Predicted:", a2)
+print("Loss:", loss)

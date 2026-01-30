@@ -1,0 +1,36 @@
+import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+import matplotlib.pyplot as plt
+import numpy as np
+(x_train,y_train),(x_test,y_test)=mnist.load_data()  #Loads MNIST dataset 
+x_train=x_train/255.0
+x_test=x_test/255.0
+model=Sequential([
+    Flatten(input_shape=(28,28)),
+    Dense(128,activation='relu'),
+    Dense(10,activation='softmax')
+])
+model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+model.fit(x_train,y_train,epochs=5)
+model.evaluate(x_test,y_test)
+# Select two images from x_test and their true labels
+image1_index = 0
+image2_index = 1
+image1 = x_test[image1_index]
+true_label1 = y_test[image1_index]
+image2 = x_test[image2_index]
+true_label2 = y_test[image2_index]
+# Make predictions for both images individually
+# The model expects a batch of images, so reshape to (1, 28, 28)
+pred1 = model.predict(image1.reshape(1, 28, 28), verbose=0)
+predicted_label1 = tf.argmax(pred1[0]).numpy()
+pred2 = model.predict(image2.reshape(1, 28, 28), verbose=0)
+predicted_label2 = tf.argmax(pred2[0]).numpy()
+combined_image = np.hstack((image1, image2)) # Combine the two images horizontally
+plt.figure(figsize=(8, 4)) # Display the combined image with true and predicted labels
+plt.imshow(combined_image, cmap='gray')
+plt.title(f"True: {true_label1}{true_label2}, Predicted: {predicted_label1}{predicted_label2}")
+plt.axis('off')
+plt.show()

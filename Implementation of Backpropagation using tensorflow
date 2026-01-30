@@ -1,0 +1,16 @@
+import tensorflow as tf
+import numpy as np
+# Builds stacked layers
+model = tf.keras.Sequential  
+([ tf.keras.layers.Dense(2, activation='sigmoid', input_shape=(3,)),
+  tf.keras.layers.Dense(1, activation='sigmoid')])
+#Sets training config
+model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.2), loss='mse')
+#Creates input/target arrays
+x = np.array([[1, 8, 3]])
+y = np.array([[0.9]])
+model.fit(x, y, epochs=1000, verbose=0) #Trains model
+y_pred = model.predict(x)
+loss = model.evaluate(x, y, verbose=0)
+print("Predicted:", y_pred)
+print("Loss:", loss)

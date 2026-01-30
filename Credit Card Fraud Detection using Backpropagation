@@ -5,9 +5,17 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-data = pd.read_csv("creditcard.csv") # Load dataset
+data = pd.read_csv("creditcard.csv", on_bad_lines='skip') # Load dataset, skipping bad lines
 X = data.drop("Class", axis=1)
 y = data["Class"]
+
+# Convert all columns in X to numeric, coercing errors to NaN
+X = X.apply(pd.to_numeric, errors='coerce')
+# Drop rows where any NaN values are present (these would be the problematic rows)
+data = data.dropna()
+X = X.dropna()
+y = y.loc[X.index] # Align y with the cleaned X
+
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)

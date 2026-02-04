@@ -1,0 +1,63 @@
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import kagglehub
+dataset_path = kagglehub.dataset_download("linkanjarad/body-parts-dataset")
+print("Dataset path:", dataset_path)
+img_size = 128
+batch_size = 32
+datagen = ImageDataGenerator(
+    rescale=1./255,
+    validation_split=0.2
+)
+import os
+actual_dataset_path = os.path.join(dataset_path, "Body Parts Dataset")
+train_data = datagen.flow_from_directory(
+    actual_dataset_path,
+    target_size=(128,128),
+    batch_size=32,
+    class_mode="categorical",
+    subset="training"
+)
+test_data = datagen.flow_from_directory(
+    actual_dataset_path,
+    target_size=(128,128),
+    batch_size=32,
+    class_mode="categorical",
+    subset="validation"
+)
+model = Sequential([
+    Conv2D(32, (3,3), activation='relu', input_shape=(img_size, img_size, 3)),
+    MaxPooling2D(2,2),
+
+    Conv2D(64, (3,3), activation='relu'),
+    MaxPooling2D(2,2),
+
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dense(train_data.num_classes, activation='softmax')
+])
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+model.summary()
+model.fit(
+    train_data,
+    epochs=3,
+    validation_data=test_data
+)
+from google.colab import files
+uploaded = files.upload()
+import numpy as np
+from tensorflow.keras.preprocessing import image
+img_path = list(uploaded.keys())[0]
+img = image.load_img(img_path, target_size=(128,128))
+img = image.img_to_array(img) / 255.0
+img = np.expand_dims(img, axis=0)
+prediction = model.predict(img)
+class_index = prediction.argmax()
+label = list(train_data.class_indices.keys())[class_index]
+print("Predicted body part:", label)
